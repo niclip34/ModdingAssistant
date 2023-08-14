@@ -90,7 +90,7 @@ namespace ModdingAssistant
                 var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
                     fixedName, function.Paramerters);
                 if (VtablePrint.IsChecked.Value)
-                    built += string.Format(" #{0}", i);
+                    built += string.Format(" //{0}", i);
                 builder.AppendLine(built);
             }
 
