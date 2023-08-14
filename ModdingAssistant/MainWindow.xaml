@@ -41,10 +41,13 @@
                             </Paragraph>
                         </FlowDocument>
                     </RichTextBox>
-                    
+
                     <Button x:Name="VtableRun" Grid.Column="1" Content="Run"
                             HorizontalAlignment="Stretch" Margin="272,0,21,0" Background="#FF5669EB"
                             BorderBrush="{x:Null}" VerticalAlignment="Stretch" Grid.Row="1" Height="40" Click="VtableRun_Click"/>
+                    
+                    <CheckBox x:Name="VtablePrint" Content="Print Index" IsChecked="True" 
+                              HorizontalAlignment="Left" Margin="20,34,0,0" Grid.Row="1" VerticalAlignment="Top"/>
 
                 </Grid>
             </hc:TabItem>

@@ -62,8 +62,9 @@ namespace ModdingAssistant
             }
 
             var builder = new StringBuilder();
-            foreach (var function in functions)
+            for (int i = 0; i < functions.Count; i++)
             {
+                var function = functions[i];
                 var fixedName = function.Name.Trim();
                 var nameSpace = fixedName.Split(new string[] { "__", "::" }, StringSplitOptions.None);
                 if (nameSpace.Length > 1)
@@ -88,6 +89,8 @@ namespace ModdingAssistant
 
                 var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
                     fixedName, function.Paramerters);
+                if (VtablePrint.IsChecked.Value)
+                    built += string.Format(" #{0}", i);
                 builder.AppendLine(built);
             }
 
