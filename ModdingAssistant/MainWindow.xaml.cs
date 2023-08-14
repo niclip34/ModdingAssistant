@@ -1,0 +1,98 @@
+﻿using HandyControl.Tools.Extension;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Documents;
+
+namespace ModdingAssistant
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        private void VtableRun_Click(object sender, RoutedEventArgs e)
+        {
+            var functions = new List<Function>();
+
+            var range = new TextRange(VtableInput.Document.ContentStart, VtableInput.Document.ContentEnd);
+            foreach (var line in range.Text.Split('\n'))
+            {
+                var offset = line.Split(new string[] { "offset" /*win*/ , "DCQ" /*android*/ }, StringSplitOptions.None);
+                if (offset.Length <= 1)
+                    continue;
+
+                var func = new Function();
+
+                // Return Type
+                var r = offset[1].Split(new string[] { "->" }, StringSplitOptions.None);
+                if (r.Length > 1)
+                {
+                    func.ReturnType = r[1].Trim();
+                    offset[1] = offset[1].Replace("->", "").Replace(r[1], ""); // :skull:
+                }
+
+                // Split for comment
+                var comment = offset[1].Split(';');
+
+                func.Name = comment[0].Trim(); // ^-^
+                if (comment.Length > 1)
+                {
+                    var commentContent = comment[1];
+                    // Read function parameters from comment
+                    var match = new Regex("\\w+(\\(.+\\))").Match(commentContent);
+                    if (match.Success)
+                    {
+                        var param = match.Groups[1].Value;
+                        func.Paramerters = param.Substring(1, param.Length - 2);
+                        // Replace paramerters to empty
+                        commentContent = commentContent.Replace(func.Paramerters, string.Empty);
+                    }
+
+                    commentContent = commentContent.Trim();
+                    if (commentContent.Length > 1)
+                        func.Name = commentContent;
+                }
+
+                functions.Add(func);
+            }
+
+            var builder = new StringBuilder();
+            foreach (var function in functions)
+            {
+                var fixedName = function.Name.Trim();
+                var nameSpace = fixedName.Split(new string[] { "__", "::" }, StringSplitOptions.None);
+                if (nameSpace.Length > 1)
+                {
+                    fixedName = nameSpace[1]; // ClientInstance::getLocalPlayer => getLocalPlayer
+                    if (fixedName == nameSpace[0])
+                        fixedName = "constructor()";
+                }
+
+                foreach (var c in "?@()* ")
+                    fixedName = fixedName.Replace(c.ToString(), "");
+
+                if (fixedName.Contains("~"))
+                    fixedName = "destructor()";
+
+                var count = 0;
+                foreach (var f in functions)
+                    if (function.Name == f.Name) count++;
+
+                if (count > 1)
+                    fixedName += "_" + (count - 1);
+
+                var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
+                    fixedName, function.Paramerters);
+                builder.AppendLine(built);
+            }
+
+            range = new TextRange(VtableOutput.Document.ContentStart, VtableOutput.Document.ContentEnd);
+            range.Text = builder.ToString();
+        }
+    }
+}
