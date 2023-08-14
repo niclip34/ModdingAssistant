@@ -6,7 +6,11 @@ This project is still in progress.
 
 ## Features
 
- - Converts ida vtable to cpp header
+ - Converts ida vtable to cpp header (Supports Windows and Android both)
 
 # GUI
 ![image](https://github.com/KamiSkiddo/ModdingAssistant/assets/136895351/7c3848d2-8053-432c-bcce-1bfe5d06ba8a)
+
+# Credit 
+
+HandyControl - [@NaBian](https://github.com/NaBian)
