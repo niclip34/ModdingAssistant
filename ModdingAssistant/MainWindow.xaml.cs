@@ -44,13 +44,13 @@ namespace ModdingAssistant
                 {
                     var commentContent = comment[1];
                     // Read function parameters from comment
-                    var match = new Regex("\\w+(\\(.+\\))").Match(commentContent);
+                    var match = new Regex("[\\w ;]+(\\(.+\\))").Match(commentContent);
                     if (match.Success)
                     {
                         var param = match.Groups[1].Value;
                         func.Paramerters = param.Substring(1, param.Length - 2);
                         // Replace paramerters to empty
-                        commentContent = commentContent.Replace(func.Paramerters, string.Empty);
+                        commentContent = commentContent.Replace(param, string.Empty);
                     }
 
                     commentContent = commentContent.Trim();
@@ -58,37 +58,54 @@ namespace ModdingAssistant
                         func.Name = commentContent;
                 }
 
+                if (func.Name.Length < 1)
+                    func.Name = "function";
+
+                // Clean function name
+                var newName = func.Name;
+
+                var nameSpace = newName.Split(new string[] { "__", "::" }, StringSplitOptions.None);
+                if (nameSpace.Length > 1)
+                {
+                    newName = nameSpace[1]; // ClientInstance::getLocalPlayer => getLocalPlayer
+                    if (newName == nameSpace[0])
+                        newName = "constructor()";
+                }
+
+                foreach (var c in "?@()* ")
+                    newName = newName.Replace(c.ToString(), "");
+
+                if (newName.Contains("~"))
+                    newName = "destructor()";
+
+                var suffix = 0;
+                while (true)
+                {
+                    foreach (var f in functions)
+                    {
+                        if (f.Name == newName)
+                        {
+                            newName = $"{func.Name}_{suffix}";
+                            suffix++;
+                            continue;
+                        }
+                    }
+
+                    break;
+                }
+                func.Name = newName;
+
                 functions.Add(func);
+                Console.WriteLine(func.Name);
             }
 
             var builder = new StringBuilder();
             for (int i = 0; i < functions.Count; i++)
             {
                 var function = functions[i];
-                var fixedName = function.Name.Trim();
-                var nameSpace = fixedName.Split(new string[] { "__", "::" }, StringSplitOptions.None);
-                if (nameSpace.Length > 1)
-                {
-                    fixedName = nameSpace[1]; // ClientInstance::getLocalPlayer => getLocalPlayer
-                    if (fixedName == nameSpace[0])
-                        fixedName = "constructor()";
-                }
-
-                foreach (var c in "?@()* ")
-                    fixedName = fixedName.Replace(c.ToString(), "");
-
-                if (fixedName.Contains("~"))
-                    fixedName = "destructor()";
-
-                var count = 0;
-                foreach (var f in functions)
-                    if (function.Name == f.Name) count++;
-
-                if (count > 1)
-                    fixedName += "_" + (count - 1);
-
+             
                 var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
-                    fixedName, function.Paramerters);
+                    function.Name, function.Paramerters);
                 if (VtablePrint.IsChecked.Value)
                     built += string.Format(" //{0}", i);
                 builder.AppendLine(built);
