@@ -62,8 +62,8 @@ namespace ModdingAssistant
                     func.Name = "function";
 
                 // Clean function name
-                var newName = func.Name;
-
+                var newName = func.Name.Trim();
+                Console.WriteLine(newName);
                 var nameSpace = newName.Split(new string[] { "__", "::" }, StringSplitOptions.None);
                 if (nameSpace.Length > 1)
                 {
@@ -79,13 +79,14 @@ namespace ModdingAssistant
                     newName = "destructor()";
 
                 var suffix = 0;
+                var old = newName;
                 while (true)
                 {
                     foreach (var f in functions)
                     {
                         if (f.Name == newName)
                         {
-                            newName = $"{func.Name}_{suffix}";
+                            newName = $"{old}_{suffix}";
                             suffix++;
                             continue;
                         }
@@ -96,14 +97,12 @@ namespace ModdingAssistant
                 func.Name = newName;
 
                 functions.Add(func);
-                Console.WriteLine(func.Name);
             }
 
             var builder = new StringBuilder();
             for (int i = 0; i < functions.Count; i++)
             {
                 var function = functions[i];
-             
                 var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
                     function.Name, function.Paramerters);
                 if (VtablePrint.IsChecked.Value)
