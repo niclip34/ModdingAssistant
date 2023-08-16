@@ -11,7 +11,10 @@ This project is still in progress.
  - Create header styled fields from structure (You can import & export as json)
 
 ## GUI
-![image](https://github.com/KamiSkiddo/ModdingAssistant/assets/136895351/7c3848d2-8053-432c-bcce-1bfe5d06ba8a)
+![image](https://github.com/KamiSkiddo/ModdingAssistant/assets/136895351/70cb384b-f546-4a09-8b24-e7dcde79ad4e)
+
+![image](https://github.com/KamiSkiddo/ModdingAssistant/assets/136895351/350b33bb-3b8b-4e4b-aa9e-9b270b0c24fa)
+
 
 ## Credit 
 
