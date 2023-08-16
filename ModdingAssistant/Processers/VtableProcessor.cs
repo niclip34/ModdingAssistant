@@ -8,7 +8,7 @@ namespace ModdingAssistant.Processer
 {
     internal class VtableProcessor : IProcessor
     {
-        public bool PrintIndex { get; set; }
+        private bool PrintIndex { get; set; }
 
         public VtableProcessor(bool printIndex)
         {

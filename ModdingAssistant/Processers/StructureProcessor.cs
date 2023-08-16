@@ -12,6 +12,13 @@ namespace ModdingAssistant.Processers
 {
     internal class StructureProcessor : IProcessor
     {
+        private bool PrintOffset { get; set; }
+
+        public StructureProcessor(bool printOffset)
+        {
+            this.PrintOffset = printOffset;
+        }
+
         public string Process(string input)
         {
             var result = new StringBuilder();
@@ -47,7 +54,11 @@ namespace ModdingAssistant.Processers
                 }
 
                 result.AppendLine("public:");
-                result.AppendLine(string.Format("{0} {1};", fields[i].FieldType, fields[i].Name));
+                result.Append(string.Format("{0} {1};", fields[i].FieldType, fields[i].Name));
+                if (PrintOffset)
+                    result.Append($" //0x{fields[i].Offset.ToString("x")}");
+                result.AppendLine();
+
                 currentPos += fields[i].Size;
             }
 

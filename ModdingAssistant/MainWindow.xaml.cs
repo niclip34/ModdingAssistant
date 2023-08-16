@@ -107,7 +107,7 @@ namespace ModdingAssistant
 
         private void StructureRun_Click(object sender, RoutedEventArgs e)
         {
-            var processor = new StructureProcessor();
+            var processor = new StructureProcessor(StructurePrint.IsChecked.Value);
             var result = processor.Process(StructureInput.Text);
             StructureOutput.Text = result;
         }
