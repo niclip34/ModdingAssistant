@@ -1,22 +1,23 @@
 ﻿using HandyControl.Tools.Extension;
+using Microsoft.Win32;
 using ModdingAssistant.Processer;
 using ModdingAssistant.Processers;
 using ModdingAssistant.Structure;
+using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace ModdingAssistant
 {
     public partial class MainWindow : Window
     {
         private StructureGrid currentInput = null;
+        private bool saved = true;
 
         public MainWindow()
         {
@@ -35,7 +36,7 @@ namespace ModdingAssistant
             var builder = new StringBuilder();
             var examples = new string[]
             {
-                "// append offset_vtable if the sdk has virtual function",
+                "// append offset_vtable if your sdk has virtual function",
                 "#offset_vtable\n",
                 "MinecraftGame* minecraftGame: 0xC8 // default size is 8",
                 "int someFiled: 0x200, 4 // size will be 4"
@@ -48,6 +49,7 @@ namespace ModdingAssistant
 
             StructuresList.SelectedIndex = StructuresList.Items.Count - 1;
             UpdateCurrent();
+            saved = false;
         }
 
         private void StructureRename_Click(object sender, RoutedEventArgs e)
@@ -57,6 +59,7 @@ namespace ModdingAssistant
                 return;
 
             ((StructureGrid)StructuresList.Items[index]).StartRenaming();
+            saved = false;
         }
 
         private void StructuresList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -75,6 +78,7 @@ namespace ModdingAssistant
                 return;
 
             StructuresList.Items.RemoveAt(index);
+            saved = false;
         }
 
         private void StructuresList_KeyDown(object sender, KeyEventArgs e)
@@ -84,7 +88,10 @@ namespace ModdingAssistant
                 return;
 
             if (e.Key == Key.Delete)
+            {
                 StructuresList.Items.RemoveAt(index);
+                saved = false;
+            }
         }
 
         private void StructureRun_Click(object sender, RoutedEventArgs e)
@@ -104,6 +111,57 @@ namespace ModdingAssistant
             if (currentInput != null)
             {
                 currentInput.SetFields(StructureInput.Text);
+                saved = false;
+            }
+        }
+
+        private void StructureImport_Click(object sender, RoutedEventArgs e)
+        {
+            if (!saved)
+            {
+                var result = MessageBox.Show("There are changed content of structure that you didn't save.\nDo you want to continue?",
+                    "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                if (result != MessageBoxResult.OK)
+                    return;
+                saved = true;
+            }
+
+            var ofd = new OpenFileDialog();
+            ofd.Filter = ".json File (*.json)|*.json|All Type (*.*)|*.*";
+            if (ofd.ShowDialog().Value)
+            {
+                StructuresList.Items.Clear();
+
+                var json = JObject.Parse(File.ReadAllText(ofd.FileName));
+                foreach (var obj in json)
+                {
+                    var grid = new StructureGrid(this, StructuresList.Name, obj.Key, obj.Value.ToString());
+                    StructuresList.Items.Add(grid);
+                }
+
+                StructuresList.SelectedIndex = StructuresList.Items.Count - 1;
+                UpdateCurrent();
+
+                saved = true;
+            }
+        }
+
+        private void StructureExport_Click(object sender, RoutedEventArgs e)
+        {
+            var sfd = new SaveFileDialog();
+            sfd.FileName = "structures.json";
+            sfd.Filter = ".json File (*.json)|*.json";
+            if (sfd.ShowDialog().Value)
+            {
+                var json = new JObject();
+                foreach (var item in StructuresList.Items)
+                {
+                    var grid = (StructureGrid)item;
+                    json[grid.GetName()] = grid.GetFields();
+                }
+
+                File.WriteAllText(sfd.FileName, json.ToString());
+                saved = true;
             }
         }
 

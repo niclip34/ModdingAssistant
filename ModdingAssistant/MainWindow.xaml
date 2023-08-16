@@ -12,7 +12,11 @@
     </Window.Resources>
 
     <Grid>
-        <hc:TabControl FontFamily="{StaticResource Inter}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="33*"/>
+            <ColumnDefinition Width="167*"/>
+        </Grid.ColumnDefinitions>
+        <hc:TabControl FontFamily="{StaticResource Inter}" Grid.ColumnSpan="2">
             <hc:TabItem Header="Vtable">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -48,13 +52,14 @@
                         <RowDefinition Height="55*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="136*"/>
+                        <ColumnDefinition Width="69*"/>
+                        <ColumnDefinition Width="67*"/>
                         <ColumnDefinition Width="153*"/>
                         <ColumnDefinition Width="110*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock HorizontalAlignment="Left" Margin="20,28,0,0" Text="Classes :" FontSize="13" VerticalAlignment="Top"/>
                     <ListBox Margin="20,50,14,20" x:Name="StructuresList" SelectionChanged="StructuresList_SelectionChanged"
-                             MouseDoubleClick="StructuresList_MouseDoubleClick" KeyDown="StructuresList_KeyDown">
+                             MouseDoubleClick="StructuresList_MouseDoubleClick" KeyDown="StructuresList_KeyDown" Grid.ColumnSpan="2">
                         <ListBox.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Add Class" Click="StructureAdd_Click" />
@@ -64,20 +69,25 @@
                         </ListBox.ContextMenu>
                     </ListBox>
 
-                    <TextBlock HorizontalAlignment="Left" Margin="11,28,0,0" Text="Input :" FontSize="13" VerticalAlignment="Top" Grid.Column="1"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="11,28,0,0" Text="Input :" FontSize="13" VerticalAlignment="Top" Grid.Column="2"/>
 
-                    <TextBox x:Name="StructureInput" TextChanged="StructureInput_TextChanged" Grid.Column="1" AcceptsReturn="True" VerticalContentAlignment="Top" 
+                    <TextBox x:Name="StructureInput" TextChanged="StructureInput_TextChanged" Grid.Column="2" AcceptsReturn="True" VerticalContentAlignment="Top" 
                            Padding="10" Margin="10,50,10,20" TextWrapping="NoWrap" Text=""/>
 
 
-                    <TextBlock HorizontalAlignment="Left" Margin="10,28,0,0" Text="Output :" FontSize="13" VerticalAlignment="Top" Grid.Column="2"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,28,0,0" Text="Output :" FontSize="13" VerticalAlignment="Top" Grid.Column="3"/>
                     <TextBox VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"
-                        x:Name="StructureOutput" FontSize="13" Margin="10,50,21,20" Block.LineHeight="1" Grid.Column="2"
+                        x:Name="StructureOutput" FontSize="13" Margin="10,50,21,20" Block.LineHeight="1" Grid.Column="3"
                         AcceptsReturn="True" VerticalContentAlignment="Top" Padding="10"/>
 
-                    <Button x:Name="StructureRun" Grid.Column="2" Content="Run"
-                            HorizontalAlignment="Stretch" Margin="41,0,21,5" Background="#FF5669EB" Height="45"
-                            BorderBrush="{x:Null}" VerticalAlignment="Stretch" Click="StructureRun_Click" Grid.Row="2"/>
+                    <Button x:Name="StructureRun" Grid.Column="3" Content="Run"
+                            HorizontalAlignment="Stretch" Margin="41,3,21,7" Background="#FF5669EB" Height="45"
+                            BorderBrush="{x:Null}" VerticalAlignment="Stretch" Click="StructureRun_Click" Grid.Row="1"/>
+
+                    <Button x:Name="StructureImport" Content="Import" Background="Transparent" HorizontalAlignment="Stretch" Click="StructureImport_Click"
+                            Margin="20,0,3,16" Grid.Row="1" VerticalAlignment="Bottom" Height="28"/>
+                    <Button x:Name="StructureExport" Content="Export" Background="Transparent" Margin="5,0,14,16" Grid.Row="1" Click="StructureExport_Click"
+                            Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
                 </Grid>
             </hc:TabItem>
         </hc:TabControl>
