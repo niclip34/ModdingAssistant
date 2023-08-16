@@ -17,11 +17,22 @@ namespace ModdingAssistant
     public partial class MainWindow : Window
     {
         private StructureGrid currentInput = null;
-        private bool saved = true;
+        private bool structureSaved = true;
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (structureSaved)
+                return;
+
+            var result = MessageBox.Show("Changed content will not saved!\nDo you still want to close this tool?", "Warning", 
+                MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+            if (result != MessageBoxResult.OK)
+                e.Cancel = true;
         }
 
         private void VtableRun_Click(object sender, RoutedEventArgs e)
@@ -49,7 +60,7 @@ namespace ModdingAssistant
 
             StructuresList.SelectedIndex = StructuresList.Items.Count - 1;
             UpdateCurrent();
-            saved = false;
+            structureSaved = false;
         }
 
         private void StructureRename_Click(object sender, RoutedEventArgs e)
@@ -59,7 +70,7 @@ namespace ModdingAssistant
                 return;
 
             ((StructureGrid)StructuresList.Items[index]).StartRenaming();
-            saved = false;
+            structureSaved = false;
         }
 
         private void StructuresList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -78,7 +89,7 @@ namespace ModdingAssistant
                 return;
 
             StructuresList.Items.RemoveAt(index);
-            saved = false;
+            structureSaved = false;
         }
 
         private void StructuresList_KeyDown(object sender, KeyEventArgs e)
@@ -90,7 +101,7 @@ namespace ModdingAssistant
             if (e.Key == Key.Delete)
             {
                 StructuresList.Items.RemoveAt(index);
-                saved = false;
+                structureSaved = false;
             }
         }
 
@@ -111,19 +122,19 @@ namespace ModdingAssistant
             if (currentInput != null)
             {
                 currentInput.SetFields(StructureInput.Text);
-                saved = false;
+                structureSaved = false;
             }
         }
 
         private void StructureImport_Click(object sender, RoutedEventArgs e)
         {
-            if (!saved)
+            if (!structureSaved)
             {
                 var result = MessageBox.Show("There are changed content of structure that you didn't save.\nDo you want to continue?",
                     "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result != MessageBoxResult.OK)
                     return;
-                saved = true;
+                structureSaved = true;
             }
 
             var ofd = new OpenFileDialog();
@@ -142,7 +153,7 @@ namespace ModdingAssistant
                 StructuresList.SelectedIndex = StructuresList.Items.Count - 1;
                 UpdateCurrent();
 
-                saved = true;
+                structureSaved = true;
             }
         }
 
@@ -161,7 +172,7 @@ namespace ModdingAssistant
                 }
 
                 File.WriteAllText(sfd.FileName, json.ToString());
-                saved = true;
+                structureSaved = true;
             }
         }
 

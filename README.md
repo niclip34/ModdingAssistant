@@ -8,9 +8,11 @@ This project is still in progress.
 
  - Converts ida vtable to cpp header (Supports Windows and Android both)
 
-# GUI
+ - Create header styled fields from structure (You can import & export as json)
+
+## GUI
 ![image](https://github.com/KamiSkiddo/ModdingAssistant/assets/136895351/7c3848d2-8053-432c-bcce-1bfe5d06ba8a)
 
-# Credit 
+## Credit 
 
 HandyControl - [@NaBian](https://github.com/NaBian)
