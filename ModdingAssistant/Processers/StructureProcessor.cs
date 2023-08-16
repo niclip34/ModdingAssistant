@@ -39,7 +39,7 @@ namespace ModdingAssistant.Processers
                 if (fields[i].Offset > 0)
                 {
                     var diff = fields[i].Offset - currentPos - 1;
-                    if (diff < 0)
+                    if (diff < -1)
                     {
                         result.AppendLine("// Invalid field " + fields[i].Name);
                         continue;
