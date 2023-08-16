@@ -8,12 +8,12 @@
         mc:Ignorable="d"
         Title="Assistant" Height="450" Width="800">
     <Window.Resources>
-        <FontFamily x:Key="Inter">/Font/Inter-Medium.ttf#Inter</FontFamily>
+        <FontFamily x:Key="Inter">/Fonts/Inter-Medium.ttf#Inter</FontFamily>
     </Window.Resources>
 
     <Grid>
-        <hc:TabControl>
-            <hc:TabItem Header="Vtable" FontFamily="{StaticResource Inter}">
+        <hc:TabControl FontFamily="{StaticResource Inter}">
+            <hc:TabItem Header="Vtable">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="113*"/>
@@ -25,36 +25,61 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock HorizontalAlignment="Left" Margin="20,28,0,0" Text="Input (Vtable):" FontSize="13" VerticalAlignment="Top"/>
-                    <RichTextBox FontSize="12" Margin="20,50,15,5" x:Name="VtableInput" Block.LineHeight="1">
-                        <FlowDocument>
-                            <Paragraph>
-                                <Run Text=".data:0000000004D7ECA8 vtable_ClientInstance dq offset ClientInstance__destructor"/>
-                            </Paragraph>
-                        </FlowDocument>
-                    </RichTextBox>
+                    <TextBox FontSize="12" Margin="20,50,15,5" x:Name="VtableInput" VerticalContentAlignment="Top" Padding="10"
+                             AcceptsReturn="True" Text=".data:0000000004D7ECA8 vtable_ClientInstance dq offset ClientInstance__destructor" />
 
                     <TextBlock HorizontalAlignment="Left" Margin="15,28,0,0" Text="Output (Header):" FontSize="13" VerticalAlignment="Top" Grid.Column="1"/>
-                    <RichTextBox FontSize="12" Margin="15,50,21,5" Grid.Column="1" x:Name="VtableOutput" Block.LineHeight="1">
-                        <FlowDocument>
-                            <Paragraph>
-                                <Run Text=""/>
-                            </Paragraph>
-                        </FlowDocument>
-                    </RichTextBox>
+                    <TextBox FontSize="12" Margin="15,50,21,5" Grid.Column="1" AcceptsReturn="True"
+                             x:Name="VtableOutput" VerticalContentAlignment="Top" Padding="10" />
 
                     <Button x:Name="VtableRun" Grid.Column="1" Content="Run"
                             HorizontalAlignment="Stretch" Margin="272,0,21,0" Background="#FF5669EB"
                             BorderBrush="{x:Null}" VerticalAlignment="Stretch" Grid.Row="1" Height="40" Click="VtableRun_Click"/>
-                    
+
                     <CheckBox x:Name="VtablePrint" Content="Print Index" IsChecked="True" 
-                              HorizontalAlignment="Left" Margin="20,34,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+                              HorizontalAlignment="Left" Margin="20,30,0,0" Grid.Row="1" VerticalAlignment="Top"/>
 
                 </Grid>
             </hc:TabItem>
-            <hc:TabItem>
-                <Grid/>
+            <hc:TabItem Header="Structures">
+                <Grid KeyboardNavigation.TabNavigation="None">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="347*"/>
+                        <RowDefinition Height="55*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="136*"/>
+                        <ColumnDefinition Width="153*"/>
+                        <ColumnDefinition Width="110*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock HorizontalAlignment="Left" Margin="20,28,0,0" Text="Classes :" FontSize="13" VerticalAlignment="Top"/>
+                    <ListBox Margin="20,50,14,20" x:Name="StructuresList" SelectionChanged="StructuresList_SelectionChanged"
+                             MouseDoubleClick="StructuresList_MouseDoubleClick" KeyDown="StructuresList_KeyDown">
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Class" Click="StructureAdd_Click" />
+                                <MenuItem Header="Delete Class" Click="StructureDelete_Click" />
+                                <MenuItem Header="Rename Class" Click="StructureRename_Click" />
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
+
+                    <TextBlock HorizontalAlignment="Left" Margin="11,28,0,0" Text="Input :" FontSize="13" VerticalAlignment="Top" Grid.Column="1"/>
+
+                    <TextBox x:Name="StructureInput" TextChanged="StructureInput_TextChanged" Grid.Column="1" AcceptsReturn="True" VerticalContentAlignment="Top" 
+                           Padding="10" Margin="10,50,10,20" TextWrapping="NoWrap" Text=""/>
+
+
+                    <TextBlock HorizontalAlignment="Left" Margin="10,28,0,0" Text="Output :" FontSize="13" VerticalAlignment="Top" Grid.Column="2"/>
+                    <TextBox VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible"
+                        x:Name="StructureOutput" FontSize="13" Margin="10,50,21,20" Block.LineHeight="1" Grid.Column="2"
+                        AcceptsReturn="True" VerticalContentAlignment="Top" Padding="10"/>
+
+                    <Button x:Name="StructureRun" Grid.Column="2" Content="Run"
+                            HorizontalAlignment="Stretch" Margin="41,0,21,5" Background="#FF5669EB" Height="45"
+                            BorderBrush="{x:Null}" VerticalAlignment="Stretch" Click="StructureRun_Click" Grid.Row="2"/>
+                </Grid>
             </hc:TabItem>
         </hc:TabControl>
-
     </Grid>
 </Window>

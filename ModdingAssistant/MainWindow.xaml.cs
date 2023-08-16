@@ -1,117 +1,150 @@
 ﻿using HandyControl.Tools.Extension;
+using ModdingAssistant.Processer;
+using ModdingAssistant.Processers;
+using ModdingAssistant.Structure;
 using System;
-using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ModdingAssistant
 {
     public partial class MainWindow : Window
     {
+        private StructureGrid currentInput = null;
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
         private void VtableRun_Click(object sender, RoutedEventArgs e)
+        {            
+            var processor = new VtableProcessor(VtablePrint.IsChecked.Value);
+            var result = processor.Process(VtableInput.Text);
+            VtableOutput.Text = result;
+        }
+
+        private void StructureAdd_Click(object sender, RoutedEventArgs e)
         {
-            var functions = new List<Function>();
-
-            var range = new TextRange(VtableInput.Document.ContentStart, VtableInput.Document.ContentEnd);
-            foreach (var line in range.Text.Split('\n'))
-            {
-                var offset = line.Split(new string[] { "offset" /*win*/ , "DCQ" /*android*/ }, StringSplitOptions.None);
-                if (offset.Length <= 1)
-                    continue;
-
-                var func = new Function();
-
-                // Return Type
-                var r = offset[1].Split(new string[] { "->" }, StringSplitOptions.None);
-                if (r.Length > 1)
-                {
-                    func.ReturnType = r[1].Trim();
-                    offset[1] = offset[1].Replace("->", "").Replace(r[1], ""); // :skull:
-                }
-
-                // Split for comment
-                var comment = offset[1].Split(';');
-
-                func.Name = comment[0].Trim(); // ^-^
-                if (comment.Length > 1)
-                {
-                    var commentContent = comment[1];
-                    // Read function parameters from comment
-                    var match = new Regex("[\\w ;]+(\\(.+\\))").Match(commentContent);
-                    if (match.Success)
-                    {
-                        var param = match.Groups[1].Value;
-                        func.Paramerters = param.Substring(1, param.Length - 2);
-                        // Replace paramerters to empty
-                        commentContent = commentContent.Replace(param, string.Empty);
-                    }
-
-                    commentContent = commentContent.Trim();
-                    if (commentContent.Length > 1)
-                        func.Name = commentContent;
-                }
-
-                if (func.Name.Length < 1)
-                    func.Name = "function";
-
-                // Clean function name
-                var newName = func.Name.Trim();
-                Console.WriteLine(newName);
-                var nameSpace = newName.Split(new string[] { "__", "::" }, StringSplitOptions.None);
-                if (nameSpace.Length > 1)
-                {
-                    newName = nameSpace[1]; // ClientInstance::getLocalPlayer => getLocalPlayer
-                    if (newName == nameSpace[0])
-                        newName = "constructor()";
-                }
-
-                foreach (var c in "?@()* ")
-                    newName = newName.Replace(c.ToString(), "");
-
-                if (newName.Contains("~"))
-                    newName = "destructor()";
-
-                var suffix = 0;
-                var old = newName;
-                while (true)
-                {
-                    foreach (var f in functions)
-                    {
-                        if (f.Name == newName)
-                        {
-                            newName = $"{old}_{suffix}";
-                            suffix++;
-                            continue;
-                        }
-                    }
-
-                    break;
-                }
-                func.Name = newName;
-
-                functions.Add(func);
-            }
-
             var builder = new StringBuilder();
-            for (int i = 0; i < functions.Count; i++)
+            var examples = new string[]
             {
-                var function = functions[i];
-                var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
-                    function.Name, function.Paramerters);
-                if (VtablePrint.IsChecked.Value)
-                    built += string.Format(" //{0}", i);
-                builder.AppendLine(built);
+                "// append offset_vtable if the sdk has virtual function",
+                "#offset_vtable\n",
+                "MinecraftGame* minecraftGame: 0xC8 // default size is 8",
+                "int someFiled: 0x200, 4 // size will be 4"
+            };
+            foreach (var line in examples)
+                builder.AppendLine(line);
+
+            var grid = new StructureGrid(this, StructuresList.Name, RefactorStructureName("Class"), builder.ToString());
+            StructuresList.Items.Add(grid);
+
+            StructuresList.SelectedIndex = StructuresList.Items.Count - 1;
+            UpdateCurrent();
+        }
+
+        private void StructureRename_Click(object sender, RoutedEventArgs e)
+        {
+            var index = StructuresList.SelectedIndex;
+            if (index == -1)
+                return;
+
+            ((StructureGrid)StructuresList.Items[index]).StartRenaming();
+        }
+
+        private void StructuresList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var index = StructuresList.SelectedIndex;
+            if (index == -1)
+                return;
+
+            ((StructureGrid)StructuresList.Items[index]).StartRenaming();
+        }
+
+        private void StructureDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var index = StructuresList.SelectedIndex;
+            if (index == -1)
+                return;
+
+            StructuresList.Items.RemoveAt(index);
+        }
+
+        private void StructuresList_KeyDown(object sender, KeyEventArgs e)
+        {
+            var index = StructuresList.SelectedIndex;
+            if (index == -1)
+                return;
+
+            if (e.Key == Key.Delete)
+                StructuresList.Items.RemoveAt(index);
+        }
+
+        private void StructureRun_Click(object sender, RoutedEventArgs e)
+        {
+            var processor = new StructureProcessor();
+            var result = processor.Process(StructureInput.Text);
+            StructureOutput.Text = result;
+        }
+
+        private void StructuresList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateCurrent();
+        }
+
+        private void StructureInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (currentInput != null)
+            {
+                currentInput.SetFields(StructureInput.Text);
+            }
+        }
+
+        private void UpdateCurrent()
+        {
+            var index = StructuresList.SelectedIndex;
+            if (index == -1)
+                return;
+
+            var grid = (StructureGrid) StructuresList.Items[index];
+            currentInput = grid;
+            StructureInput.Text = grid.GetFields();
+        }
+
+        public string RefactorStructureName(string original, StructureGrid from = null)
+        {
+            "@?\\><{}^|*()&%$#\"!\'-+*:".ForEach(c => original = original.Replace(c.ToString(), ""));
+            original = original.Trim();
+
+            var refactored = original;
+            var count = 0;
+            while (true)
+            {
+                var flagged = false;
+                foreach (var grid in StructuresList.Items)
+                {
+                    var st = (StructureGrid)grid;
+                    if (st.GetName().ToLower().Equals(refactored, StringComparison.OrdinalIgnoreCase)
+                        && from != st)
+                    {
+                        count++;
+                        refactored = string.Format("{0}_{1}", original, count);
+                        flagged = true;
+                        break;
+                    }
+                }
+                if (!flagged)
+                    break;
             }
 
-            range = new TextRange(VtableOutput.Document.ContentStart, VtableOutput.Document.ContentEnd);
-            range.Text = builder.ToString();
+            return refactored;
         }
     }
 }
