@@ -12,10 +12,6 @@
     </Window.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="33*"/>
-            <ColumnDefinition Width="167*"/>
-        </Grid.ColumnDefinitions>
         <hc:TabControl FontFamily="{StaticResource Inter}" Grid.ColumnSpan="2">
             <hc:TabItem Header="Vtable">
                 <Grid>
@@ -91,6 +87,50 @@
 
                     <CheckBox x:Name="StructurePrint" Content="Print Offset" IsChecked="True" Margin="10,0,0,24" Grid.Row="1" Grid.Column="2" 
                               HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                </Grid>
+            </hc:TabItem>
+            <hc:TabItem Header="Injector">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25*"/>
+                        <RowDefinition Height="41*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Height="Auto">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="317*"/>
+                            <ColumnDefinition Width="82*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,42,0,0" Text="Target DLL :" FontSize="14" VerticalAlignment="Top"/>
+                        <TextBox x:Name="InjectorTextBox" Text="C:" Margin="121,37,89,0" Height="28" VerticalAlignment="Top" Grid.ColumnSpan="2" />
+                        <Button x:Name="InjectorRefButton" Content="..." HorizontalAlignment="Stretch" Margin="87,36,28,0" VerticalAlignment="Top" Grid.Column="1" Click="InjectorRefButton_Click"/>
+
+                        <Button x:Name="InjectButton" Content="Inject"
+                            HorizontalAlignment="Stretch" Margin="0,96,28,0" Background="#FF5669EB"
+                            BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40" Click="InjectButton_Click" Grid.Column="1"/>
+                    </Grid>
+                    <Grid Margin="0,3,0,0" Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="74"/>
+                            <RowDefinition Height="65"/>
+                            <RowDefinition Height="108"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="99*"/>
+                            <ColumnDefinition Width="101*"/>
+                            <ColumnDefinition Width="53*"/>
+                            <ColumnDefinition Width="146*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock HorizontalAlignment="Left" Margin="25,40,0,0" Text="Select DLL :" FontSize="14" VerticalAlignment="Top"/>
+                        <hc:ComboBox x:Name="InjectorModules" Margin="119,34,20,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+
+                        <Button x:Name="DumpButton" Content="Dump to file"
+                            HorizontalAlignment="Stretch" Margin="25,0,13,9" Background="#FF5669EB"
+                            BorderBrush="{x:Null}" VerticalAlignment="Bottom" Height="40" Click="DumpButton_Click" Grid.Row="1"/>
+                        <Button x:Name="UnloadButton" Content="Unload"
+                            HorizontalAlignment="Stretch" Margin="22,16,20,0" Background="#FF5669EB"
+                            BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40" Click="UnloadButton_Click" Grid.Column="1" Grid.Row="1"/>
+                        <Button Grid.Column="2" x:Name="InjectorRefresh" Content="Refresh" Margin="0,34,0,0" VerticalAlignment="Top" Width="86" Height="30" Click="InjectorRefresh_Click"/>
+                    </Grid>
                 </Grid>
             </hc:TabItem>
         </hc:TabControl>

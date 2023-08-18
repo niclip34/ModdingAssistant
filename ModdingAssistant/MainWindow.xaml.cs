@@ -5,6 +5,7 @@ using ModdingAssistant.Processers;
 using ModdingAssistant.Structure;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -176,13 +177,110 @@ namespace ModdingAssistant
             }
         }
 
+
+        private void InjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            var path = InjectorTextBox.Text;
+            if (!File.Exists(path))
+            {
+                MessageBox.Show("Please input correct path to dll!", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                return;
+            }
+
+            if (!MemoryHelper.CheckMinecraft())
+            {
+                MessageBox.Show("Please launch Minecraft to inject your dll!", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                return;
+            }
+
+            if (MemoryHelper.AlreadyInjected(path))
+            {
+                var result = MessageBox.Show("Your specified dll seems already injected.\nDo you want to continue?", "Warning",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
+
+            MemoryHelper.AddPermission(path);
+            MemoryHelper.Inject(path);
+            MessageBox.Show("Injected!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void InjectorRefButton_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.Filter = ".DLL File (*.dll)|*.dll|All File (*.*)|*.*";
+            if (ofd.ShowDialog().Value)
+            {
+                InjectorTextBox.Text = ofd.FileName;
+            }
+        }
+
+        private void InjectorRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            if (!MemoryHelper.CheckMinecraft())
+                return;
+
+            InjectorModules.Items.Clear();
+            foreach (ProcessModule module in MemoryHelper.GetMinecraftProcess().Modules)
+            {
+                if (module.ModuleName == "Minecraft.Windows.exe" || module.FileName.ToLower().Contains("system32"))
+                    continue;
+                InjectorModules.Items.Add(module.ModuleName);
+            }
+            InjectorModules.SelectedIndex = 0;
+        }
+
+        private void UnloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (InjectorModules.SelectedIndex == -1)
+                return;
+
+            foreach (ProcessModule module in MemoryHelper.GetMinecraftProcess().Modules)
+            {
+                if (module.ModuleName == "Minecraft.Windows.exe" || module.FileName.ToLower().Contains("system32"))
+                    continue;
+
+                if (module.ModuleName == (string)InjectorModules.Items[InjectorModules.SelectedIndex])
+                {
+                    MemoryHelper.Unload(module.FileName);
+                    MessageBox.Show("Unloaded", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+            }
+        }
+
+        private void DumpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (InjectorModules.SelectedIndex == -1)
+                return;
+
+            var sfd = new SaveFileDialog();
+            sfd.Filter = ".Dll File (*.dll)|*.dll|All File (*.*)|*.*";
+            if (!sfd.ShowDialog().Value)
+                return;
+
+            foreach (ProcessModule module in MemoryHelper.GetMinecraftProcess().Modules)
+            {
+                if (module.ModuleName == "Minecraft.Windows.exe" || module.FileName.ToLower().Contains("system32"))
+                    continue;
+
+                if (module.ModuleName == (string)InjectorModules.Items[InjectorModules.SelectedIndex])
+                {
+                    MemoryHelper.DumpToFile(module.FileName, sfd.FileName);
+                    MessageBox.Show("Dumped", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+            }
+        }
+
         private void UpdateCurrent()
         {
             var index = StructuresList.SelectedIndex;
             if (index == -1)
                 return;
 
-            var grid = (StructureGrid) StructuresList.Items[index];
+            var grid = (StructureGrid)StructuresList.Items[index];
             currentInput = grid;
             StructureInput.Text = grid.GetFields();
         }
