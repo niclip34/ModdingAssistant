@@ -29,11 +29,14 @@ namespace ModdingAssistant.Processers
             var pad = 0;
             if (vtable)
                 currentPos += 8;
+
             for (int i = 0; i < fields.Count; i++)
             {
                 // append offset
                 if (fields[i].Offset > 0)
                 {
+                    if (!vtable && i == 0)
+                        currentPos--;
                     var diff = fields[i].Offset - currentPos - 1;
                     if (diff < -1)
                     {
@@ -47,7 +50,7 @@ namespace ModdingAssistant.Processers
                         currentPos += diff;
                         pad++;
                     }
-                }
+                } 
 
                 result.AppendLine("public:");
                 result.Append(string.Format("{0} {1};", fields[i].FieldType, fields[i].Name));
