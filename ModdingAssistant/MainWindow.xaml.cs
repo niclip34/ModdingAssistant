@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -193,13 +194,13 @@ namespace ModdingAssistant
                 return;
             }
 
-            if (MemoryHelper.AlreadyInjected(path))
+            string dllpath = GetDllPath(path);
+            if (MemoryHelper.AlreadyInjected(dllpath))
             {
-                var result = MessageBox.Show("Your specified dll seems already injected.\nDo you want to continue?", "Warning",
-                    MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-                if (result != MessageBoxResult.Yes)
-                    return;
+                MemoryHelper.Unload(dllpath);
+                Thread.Sleep(300);
             }
+            File.Copy(path, dllpath, true);
 
             MemoryHelper.AddPermission(path);
             MemoryHelper.Inject(path);
@@ -312,6 +313,12 @@ namespace ModdingAssistant
             }
 
             return refactored;
+        }
+
+        private string GetDllPath(string dllpath)
+        {
+            string filename = Path.GetFileName(dllpath);
+            return Path.Combine(Path.GetTempPath(), filename);
         }
     }
 }
