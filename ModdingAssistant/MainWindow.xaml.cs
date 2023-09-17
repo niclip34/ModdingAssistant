@@ -225,7 +225,7 @@ namespace ModdingAssistant
             InjectorModules.Items.Clear();
             foreach (ProcessModule module in MemoryHelper.GetMinecraftProcess().Modules)
             {
-                if (module.ModuleName == "Minecraft.Windows.exe" || module.FileName.ToLower().Contains("system32"))
+                if (module.ModuleName == "Minecraft.Windows.exe")
                     continue;
                 InjectorModules.Items.Add(module.ModuleName);
             }
@@ -239,7 +239,7 @@ namespace ModdingAssistant
 
             foreach (ProcessModule module in MemoryHelper.GetMinecraftProcess().Modules)
             {
-                if (module.ModuleName == "Minecraft.Windows.exe" || module.FileName.ToLower().Contains("system32"))
+                if (module.ModuleName == "Minecraft.Windows.exe")
                     continue;
 
                 if (module.ModuleName == (string)InjectorModules.Items[InjectorModules.SelectedIndex])

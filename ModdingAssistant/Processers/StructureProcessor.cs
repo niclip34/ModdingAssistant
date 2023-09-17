@@ -28,7 +28,7 @@ namespace ModdingAssistant.Processers
             var currentPos = 0;
             var pad = 0;
             if (vtable)
-                currentPos += 8;
+                currentPos += 7;
 
             for (int i = 0; i < fields.Count; i++)
             {
