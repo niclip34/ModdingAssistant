@@ -12,7 +12,7 @@
     </Window.Resources>
 
     <Grid>
-        <hc:TabControl FontFamily="{StaticResource Inter}" Grid.ColumnSpan="2">
+        <hc:TabControl FontFamily="{StaticResource Inter}" Grid.ColumnSpan="2" CanBeClosedByMiddleButton="False" TabItemWidth="180">
             <hc:TabItem Header="Vtable">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -39,7 +39,36 @@
                     <CheckBox x:Name="VtablePrint" Content="Print Index" IsChecked="True" 
                               HorizontalAlignment="Left" Margin="20,30,0,0" Grid.Row="1" VerticalAlignment="Top"/>
 
+
                 </Grid>
+            </hc:TabItem>
+            <hc:TabItem Header="AutoRenamer">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock HorizontalAlignment="Left" Margin="20,28,0,0" Text="Input (Header):" FontSize="13" VerticalAlignment="Top"/>
+                    <TextBox FontSize="12" Margin="20,50,15,5" x:Name="AutoRenamerInput" VerticalContentAlignment="Top" Padding="10"
+             AcceptsReturn="True" Text="class Level {&#10;public:&#10;    virtual void destructor(); //0&#10;    virtual void initialize(std::string const &amp;, __int64, __int64, __int64, std::string *); //1&#10;    virtual void startLeaveGame(); //2&#10;    virtual void isLeaveGameDone(); //3&#10;}" />
+
+                    <TextBlock HorizontalAlignment="Left" Margin="15,28,0,0" Text="Output (AutoRenamer JSON):" FontSize="13" VerticalAlignment="Top" Grid.Column="1"/>
+                    <TextBox FontSize="12" Margin="15,50,21,5" Grid.Column="1" AcceptsReturn="True"
+             x:Name="AutoRenamerOutput" VerticalContentAlignment="Top" Padding="10" />
+
+                    <Button x:Name="AutoRenamerRun" Grid.Column="1" Content="Run"
+            HorizontalAlignment="Stretch" Margin="272,0,21,0" Background="#FF5669EB"
+            BorderBrush="{x:Null}" VerticalAlignment="Stretch" Grid.Row="1" Height="40" Click="AutoRenamerRun_Click"/>
+
+					<TextBox x:Name="AutoRenamerAddress" Grid.Row="1" Margin="20,0,0,0" Width="120" HorizontalAlignment="Left" Text="0505FE28"  VerticalAlignment="Center" TextChanged="AutoRenamerAddress_TextChanged" />
+					<!--<hc:NumericUpDown x:Name="AutoRenamerAddress" Grid.Row="1" Margin="20,0,0,0" Width="120" HorizontalAlignment="Left" VerticalAlignment="Center" />-->
+
+				</Grid>
             </hc:TabItem>
             <hc:TabItem Header="Structures">
                 <Grid KeyboardNavigation.TabNavigation="None">
@@ -96,17 +125,23 @@
                         <RowDefinition Height="41*"/>
                     </Grid.RowDefinitions>
                     <Grid Height="Auto">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="65"/>
+                        </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="317*"/>
-                            <ColumnDefinition Width="82*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="500*"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="75"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock HorizontalAlignment="Left" Margin="25,42,0,0" Text="Target DLL :" FontSize="14" VerticalAlignment="Top"/>
-                        <TextBox x:Name="InjectorTextBox" Text="C:" Margin="121,37,89,0" Height="28" VerticalAlignment="Top" Grid.ColumnSpan="2" />
-                        <Button x:Name="InjectorRefButton" Content="..." HorizontalAlignment="Stretch" Margin="87,36,28,0" VerticalAlignment="Top" Grid.Column="1" Click="InjectorRefButton_Click"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="20,42,10,0" Text="Target DLL :" FontSize="14" VerticalAlignment="Top"/>
+                        <TextBox x:Name="InjectorTextBox" Text="C:" Margin="10,37,5,0" Height="28" VerticalAlignment="Top" Grid.Column="1" Grid.ColumnSpan="2" />
+                        <Button x:Name="InjectorRefButton" Content="..." HorizontalAlignment="Stretch" Margin="5,37,20,0" VerticalAlignment="Top" Grid.Column="3" Click="InjectorRefButton_Click"/>
 
                         <Button x:Name="InjectButton" Content="Inject"
-                            HorizontalAlignment="Stretch" Margin="0,96,28,0" Background="#FF5669EB"
-                            BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40" Click="InjectButton_Click" Grid.Column="1"/>
+                            HorizontalAlignment="Stretch" Margin="20,0,20,0" Background="#FF5669EB"
+                            BorderBrush="{x:Null}" VerticalAlignment="Center" Height="40" Click="InjectButton_Click" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1"/>
                     </Grid>
                     <Grid Margin="0,3,0,0" Grid.Row="1">
                         <Grid.RowDefinitions>
@@ -115,10 +150,10 @@
                             <RowDefinition Height="108"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="99*"/>
-                            <ColumnDefinition Width="101*"/>
-                            <ColumnDefinition Width="53*"/>
-                            <ColumnDefinition Width="146*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="400"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock HorizontalAlignment="Left" Margin="25,40,0,0" Text="Select DLL :" FontSize="14" VerticalAlignment="Top"/>
                         <hc:ComboBox x:Name="InjectorModules" Margin="119,34,20,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
@@ -127,9 +162,9 @@
                             HorizontalAlignment="Stretch" Margin="25,0,13,9" Background="#FF5669EB"
                             BorderBrush="{x:Null}" VerticalAlignment="Bottom" Height="40" Click="DumpButton_Click" Grid.Row="1"/>
                         <Button x:Name="UnloadButton" Content="Unload"
-                            HorizontalAlignment="Stretch" Margin="22,16,20,0" Background="#FF5669EB"
-                            BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40" Click="UnloadButton_Click" Grid.Column="1" Grid.Row="1"/>
-                        <Button Grid.Column="2" x:Name="InjectorRefresh" Content="Refresh" Margin="0,34,0,0" VerticalAlignment="Top" Width="86" Height="30" Click="InjectorRefresh_Click"/>
+                            HorizontalAlignment="Left" Margin="22,16,0,0" Background="#FF5669EB"
+                            BorderBrush="{x:Null}" VerticalAlignment="Top" Height="40" Click="UnloadButton_Click" Grid.Column="1" Grid.Row="1" Width="114"/>
+                        <Button Grid.Column="2" x:Name="InjectorRefresh" Content="Refresh" Margin="0,34,0,0" VerticalAlignment="Top" Width="86" Click="InjectorRefresh_Click"/>
                     </Grid>
                 </Grid>
             </hc:TabItem>

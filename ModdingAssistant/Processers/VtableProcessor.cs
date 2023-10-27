@@ -23,7 +23,7 @@ namespace ModdingAssistant.Processer
             {
                 var function = functions[i];
                 var built = string.Format("virtual {0} {1}({2});", function.ReturnType == null ? "void" : function.ReturnType,
-                    function.Name, function.Paramerters);
+                    function.Name, function.Parameters);
                 if (PrintIndex)
                     built += string.Format(" //{0}", i);
                 builder.AppendLine(built);
@@ -38,7 +38,7 @@ namespace ModdingAssistant.Processer
 
             foreach (var line in input.Split('\n'))
             {
-                var offset = line.Split(new string[] { "offset" /*win*/ , "DCQ" /*android*/ }, StringSplitOptions.None);
+                var offset = line.Split(new string[] { "offset" /*x86_64*/ , "DCQ" /*armv8*/ }, StringSplitOptions.None);
                 if (offset.Length <= 1)
                     continue;
 
@@ -64,7 +64,7 @@ namespace ModdingAssistant.Processer
                     if (match.Success)
                     {
                         var param = match.Groups[1].Value;
-                        func.Paramerters = param.Substring(1, param.Length - 2);
+                        func.Parameters = param.Substring(1, param.Length - 2);
                         // Replace paramerters to empty
                         commentContent = commentContent.Replace(param, string.Empty);
                     }
@@ -122,13 +122,13 @@ namespace ModdingAssistant.Processer
         {
             public string Name { get; set; }
             public string ReturnType { get; set; }
-            public string Paramerters { get; set; }
+            public string Parameters { get; set; }
 
             public Function()
             {
                 Name = string.Empty;
                 ReturnType = null;
-                Paramerters = string.Empty;
+                Parameters = string.Empty;
             }
         }
     }

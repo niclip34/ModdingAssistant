@@ -7,6 +7,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -42,7 +44,14 @@ namespace ModdingAssistant
             var processor = new VtableProcessor(VtablePrint.IsChecked.Value);
             var result = processor.Process(VtableInput.Text);
             VtableOutput.Text = result;
-        }
+		}
+
+		private void AutoRenamerRun_Click(object sender, RoutedEventArgs e)
+		{
+            var processor = new AutoRenamerProcessor(int.Parse(AutoRenamerAddress.Text, System.Globalization.NumberStyles.HexNumber));
+            var result = processor.Process(AutoRenamerInput.Text);
+            AutoRenamerOutput.Text = result;
+		}
 
         private void StructureAdd_Click(object sender, RoutedEventArgs e)
         {
@@ -319,6 +328,32 @@ namespace ModdingAssistant
         {
             string filename = Path.GetFileName(dllpath);
             return Path.Combine(Path.GetTempPath(), filename);
+        }
+
+        private void AutoRenamerAddress_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+            bool prefix = false;
+
+            try
+            {
+                prefix = text.StartsWith("0x");
+                if (prefix)
+                {
+                    text = text.Substring(2);
+                }
+            }
+            catch (StackOverflowException)
+            {
+            }
+            bool isValidHex = System.Text.RegularExpressions.Regex.IsMatch(text, "^[0-9A-Fa-f]*$");
+
+            if (!isValidHex)
+            {
+                textBox.Text = (prefix ? "0x" : "") + string.Join("", text.Where(c => "0123456789ABCDEFabcdef".Contains(c)));
+                textBox.SelectionStart = textBox.Text.Length;
+            }
         }
     }
 }
